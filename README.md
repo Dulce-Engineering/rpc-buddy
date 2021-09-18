@@ -20,12 +20,15 @@ class someClass
 
 Integrate with Express and specify which methods to expose like so:
 ```javascript
-new RPC_Buddy (expressApp, '/rpc-server', '/rpc-client', [someClass], ["someClass.someFunction"]);
+const RPC_Buddy = require('./RPC_Buddy');
+const Sample_Class = require('./Sample_Class');
+
+new RPC_Buddy(expressApp, '/serverUrl', '/clientUrl', [someClass], ["someClass.someFunction"]);
 ```
 
-In your browser code you could, straight away, make backend calls like so:
+In your browser code you can, straight away, make backend calls like so:
 ```javascript
-import someClass from "/rpc-client?class=someClass";
+import someClass from "/clientUrl?class=someClass";
 
 window.onload = main;
 async function main()
