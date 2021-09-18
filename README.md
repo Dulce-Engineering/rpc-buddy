@@ -20,10 +20,10 @@ class someClass
 
 Integrate with Express and specify which methods to expose like so:
 ```javascript
-const RPC_Buddy = require('./RPC_Buddy');
-const Sample_Class = require('./Sample_Class');
+const rpcBuddy = require('./RPC_Buddy');
+const someClass = require('./someClass');
 
-new RPC_Buddy(expressApp, '/serverUrl', '/clientUrl', [someClass], ["someClass.someFunction"]);
+new rpcBuddy(expressApp, '/serverUrl', '/clientUrl', [someClass], ["someClass.someFunction"]);
 ```
 
 In your browser code you can, straight away, make backend calls like so:
@@ -34,7 +34,7 @@ window.onload = main;
 async function main()
 {
   const res = await someClass.someFunction("one", "two", "three");
-  alert(res);
+  alert(res); // will show "one, two, three"
 }
 ```
 
