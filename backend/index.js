@@ -11,7 +11,8 @@ const rpc_buddy = new RPC_Buddy
   app, 
   '/rpc-server', 
   '/rpc-client',
-  [Sample_Class]
+  [Sample_Class],
+  ["Sample_Class.someFunction", "Sample_Class.Another_Function"]
 );
 
 const port = 80;

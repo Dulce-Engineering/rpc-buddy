@@ -1,6 +1,8 @@
 <html>
   <head>
-    <script>
+    <script type="module">
+      import Sample_Class from "/rpc-client?class=Sample_Class";
+
       window.onload = main;
 
       function main()
@@ -11,26 +13,10 @@
 
       async function OnClick_Send_Btn()
       {
-        const body =
-        {
-          jsonrpc: "2.0",
-          method: "Sample_Class.someFunction",
-          params: {p1: "mary", p2: "had", p3: "a little lamb"},
-          id: 123
-        };
-        const http_res = await fetch("rpc-server", 
-        {
-          method: "post", 
-          headers: 
-          {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body)
-        });
-        const http_json = await http_res.json();
+        const res = await Sample_Class.someFunction("one", "two", "three");
 
         const res_div = document.getElementById("res_div");
-        res_div.innerText = JSON.stringify(http_json);
+        res_div.innerText = JSON.stringify(res);
       }
     </script>
   </head>
