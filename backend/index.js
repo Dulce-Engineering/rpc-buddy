@@ -1,12 +1,20 @@
 const express = require('express');
 const RPC_Buddy = require('./RPC_Buddy');
+const Sample_Class = require('./Sample_Class');
 
 const app = express();
-const port = 80;
-const rpc_buddy = new RPC_Buddy(app, '/rpc-server', '/rpc-client');
-
+app.use(express.json());
 app.use(express.static('frontend'));
 
+const rpc_buddy = new RPC_Buddy
+(
+  app, 
+  '/rpc-server', 
+  '/rpc-client',
+  [Sample_Class]
+);
+
+const port = 80;
 app.listen(port, Listen);
 function Listen()
 {

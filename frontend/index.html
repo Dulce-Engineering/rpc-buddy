@@ -1,5 +1,44 @@
 <html>
+  <head>
+    <script>
+      window.onload = main;
+
+      function main()
+      {
+        const send_btn = document.getElementById("send_btn");
+        send_btn.addEventListener("click", OnClick_Send_Btn);
+      }
+
+      async function OnClick_Send_Btn()
+      {
+        const body =
+        {
+          jsonrpc: "2.0",
+          method: "Sample_Class.someFunction",
+          params: {p1: "mary", p2: "had", p3: "a little lamb"},
+          id: 123
+        };
+        const http_res = await fetch("rpc-server", 
+        {
+          method: "post", 
+          headers: 
+          {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+        const http_json = await http_res.json();
+
+        const res_div = document.getElementById("res_div");
+        res_div.innerText = JSON.stringify(http_json);
+      }
+    </script>
+  </head>
   <body>
     Hello World!
+    <div>
+      <button id="send_btn">Send</button>
+      <div id="res_div"></div>
+    </div>
   </body>
 </html>
