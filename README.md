@@ -23,7 +23,13 @@ Integrate with Express and specify which methods to expose like so:
 const rpcBuddy = require('./RPC_Buddy');
 const someClass = require('./someClass');
 
-new rpcBuddy(expressApp, '/serverUrl', '/clientUrl', [someClass], ["someClass.someFunction"]);
+new rpcBuddy
+(
+  expressApp, 
+  '/serverUrl', '/clientUrl', // backend endpoints
+  [someClass], // classes to expose
+  [{name: "someClass.someFunction"}] // class methods to expose
+);
 ```
 
 In your browser code you can, straight away, make backend calls like so:
@@ -40,6 +46,4 @@ async function main()
 
 ## To Do
 - Error Handling
-- Dependency Injection
-- Asynchronous Methods
 - Authentication

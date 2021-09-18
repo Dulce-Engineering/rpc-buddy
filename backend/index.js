@@ -12,7 +12,10 @@ const rpc_buddy = new RPC_Buddy
   '/rpc-server', 
   '/rpc-client',
   [Sample_Class],
-  ["Sample_Class.someFunction", "Sample_Class.Another_Function"]
+  [
+    {name: "Sample_Class.someFunction"},
+    {name: "Sample_Class.Another_Function"},
+  ]
 );
 
 const port = 80;
