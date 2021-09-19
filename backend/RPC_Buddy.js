@@ -1,10 +1,12 @@
+const Exception = require("../models/Exception");
 
 class RPC_Buddy
 {
-  constructor(express_app, server_url, client_url, class_instances, fns, client_type)
+  constructor(express_app, server_url, client_url, class_instances, fns, client_type, on_error_fn)
   {
     this.class_instances = class_instances;
     this.fns = fns;
+    this.on_error_fn = on_error_fn;
     this.Client_Express = this.Client_Express.bind(this);
     this.Client_Koa = this.Client_Koa.bind(this);
     this.Server_Express = this.Server_Express.bind(this);
@@ -24,9 +26,30 @@ class RPC_Buddy
 
   Client(req)
   {
-    const class_name = req.query.class;
-    const server_host = req.query.serverHost || "";
+    let class_def;
 
+    const server_host = req.query.serverHost || "";
+    const class_name = req.query.class;
+    if (class_name)
+    {
+      class_def = 
+        this.Client_Class(class_name, server_host) +
+        `export default ${class_name};`;
+    }
+    else
+    {
+      const class_defs = this.class_instances.map(c => this.Client_Class(c.name, server_host));
+      const class_names = this.class_instances.map(c => c.name);
+      class_def = 
+        class_defs.join("") +
+        `export default {${class_names.join(", ")}};`;
+    }
+
+    return class_def;
+  }
+
+  Client_Class(class_name, server_host)
+  {
     //const class_instance = this.class_instances.find(c => c.name == class_name);
     const class_fns = this.fns.filter(fn => fn.name.split(".")[0] == class_name);
     const fn_names = class_fns.map(fn => fn.name.split(".")[1]);
@@ -74,8 +97,6 @@ class RPC_Buddy
           return http_json.result;
         }
       }
-
-      export default ${class_name};
     `;
 
     return class_def;
@@ -99,31 +120,63 @@ class RPC_Buddy
 
   async Server(req_rpc)
   {
+    let res_fn, error;
     const fn = this.Get_Fn(req_rpc.method);
     const params_array = this.Get_Params(req_rpc);
-    const res_fn = await fn(...params_array);
+
+    try
+    {
+      res_fn = await fn(...params_array);
+    }
+    catch (exception)
+    {
+      this.error = exception;
+      error = 
+      {
+        code: exception.name,
+        message: exception.message
+      }
+    }
 
     const res_rpc = 
     {
       jsonrpc: "2.0",
       result: res_fn,
       id: req_rpc.id,
-      error: null
+      error
     };
     
     return res_rpc;
   }
 
-  async Server_Express(req, res)
+  async Server_Express(req, res, next)
   {
     const res_rpc = await this.Server(req.body);
     res.json(res_rpc);
+
+    if (this.error)
+    {
+      if (this.on_error_fn)
+      {
+        this.on_error_fn(this.error, req, res, next);
+      }
+      this.error = null;
+    }
   }
 
   async Server_Koa(ctx)
   {
     const res_rpc = await this.Server(ctx.request.body);
     ctx.body = res_rpc;
+
+    if (this.error)
+    {
+      if (this.on_error_fn)
+      {
+        this.on_error_fn(this.error, ctx);
+      }
+      this.error = null;
+    }
   }
 
   Get_Fn(fn_namespace)
