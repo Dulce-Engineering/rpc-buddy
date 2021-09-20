@@ -1,13 +1,13 @@
-# rpc-buddy
-RPC Buddy allows developers to automatically expose back-end Javascript methods for use by browser frontend code.
+# RPC Buddy
+RPC Buddy allows me to automatically expose back-end Javascript methods for use by browser frontend code.
 
-## Never again write a single line of "fetch" code!!
-Attach this single class to your Express setup, specify which classes and methods to expose and BAM!
-Your methods are accessible! 
-On the frontend just import a dynamically generated client and start making direct identical calls to your methods.
+## Never again do I have to write a single line of "fetch" code!!
+I attach this single class to my Express setup, specify which classes and methods to expose and BAM!
+My methods are accessible! 
+On the frontend, I just import a dynamically generated client and start making direct identical calls to my methods.
 
 ## An Example
-Say you have a backend class like so:
+Say I have a backend class like so:
 ```javascript
 class someClass
 {
@@ -18,7 +18,7 @@ class someClass
 }
 ```
 
-Integrate with Express and specify which methods to expose like so:
+I integrate RPC Buddy with Express and specify which methods to expose like so:
 ```javascript
 const rpcBuddy = require('./RPC_Buddy');
 const someClass = require('./someClass');
@@ -32,7 +32,7 @@ new rpcBuddy
 );
 ```
 
-In your browser code you can, straight away, make backend calls like so:
+In my browser code I can, straight away, make backend calls like so:
 ```javascript
 import someClass from "/clientUrl?class=someClass";
 
@@ -43,6 +43,3 @@ async function main()
   alert(res); // will show "one, two, three"
 }
 ```
-
-## To Do
-- Authentication
