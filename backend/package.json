@@ -1,0 +1,26 @@
+{
+  "name": "rpc-buddy",
+  "version": "1.0.0",
+  "description": "RPC Buddy allows me to automatically expose back-end Javascript methods for use by browser frontend code.",
+  "main": "RPC_Buddy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dulce-Engineering/rpc-buddy.git"
+  },
+  "keywords": [
+    "json",
+    "rpc",
+    "javascript",
+    "nodejs",
+    "express"
+  ],
+  "author": "Dulce Engineering",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Dulce-Engineering/rpc-buddy/issues"
+  },
+  "homepage": "https://github.com/Dulce-Engineering/rpc-buddy#readme"
+}

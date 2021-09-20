@@ -1,4 +1,3 @@
-const Exception = require("../models/Exception");
 
 class RPC_Buddy
 {
