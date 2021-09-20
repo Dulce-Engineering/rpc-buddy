@@ -82,7 +82,7 @@ class RPC_Buddy
             id: Date.now()
           };
           const server_host = ${class_name}.server_host || "${server_host}";
-          const http_res = await fetch(server_host + "/rpc-server", 
+          const http_res = await fetch(server_host + "/rpc-server?fn=" + method, 
           {
             method: "post", 
             headers: 
@@ -173,7 +173,7 @@ class RPC_Buddy
     {
       if (this.on_error_fn)
       {
-        this.on_error_fn(this.error, ctx);
+        await this.on_error_fn(this.error, ctx);
       }
       this.error = null;
     }
