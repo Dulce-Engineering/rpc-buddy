@@ -43,3 +43,5 @@ async function main()
   alert(res); // will show "one, two, three"
 }
 ```
+
+Main docs at homepage.
