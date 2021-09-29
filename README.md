@@ -43,3 +43,12 @@ async function main()
   alert(res); // will show "one, two, three"
 }
 ```
+
+## Client URL Options
+- noexport: When specified, the resulting code does not export the defined classes. They are, instead, avilable globally.
+- class=class_name: When specified, only code for a single class is generated.
+- serverHost=url: When specified, all http request URLs are prepended with the given value.
+
+## Client Class Fields
+- headers Object: When specified, all given headers are applied to all HTTP requests for the class.
+- On_Fetch Function(url, options, http_res): When specified, all "fetch" results are passed to given function.
