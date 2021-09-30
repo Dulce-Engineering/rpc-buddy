@@ -1,6 +1,6 @@
 {
   "name": "rpc-buddy",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "RPC Buddy allows me to automatically expose back-end Javascript methods for use by browser frontend code.",
   "main": "RPC_Buddy.js",
   "scripts": {
