@@ -62,6 +62,10 @@ class RPC_Buddy
   Client_Class(class_name, server_host)
   {
     const class_fns = this.fns.filter(fn => fn.name.split(".")[0] == class_name);
+    if (!server_host)
+    {
+      server_host = "";
+    }
     const fn_bodies = class_fns.map(fn => `
       static ${fn.name.split(".")[1]}()
       {
@@ -109,6 +113,7 @@ class RPC_Buddy
           }
           
           const http_res = await fetch(url, options);
+          ${class_name}.last_rpc_status = http_res.status;
           if (${class_name}.On_Fetch)
           {
             ${class_name}.On_Fetch(url, options, http_res);
@@ -118,10 +123,13 @@ class RPC_Buddy
           {
             ${class_name}.last_rpc_raw = http_text;
 
-            const http_json = JSON.parse(http_text);
-            ${class_name}.last_rpc = http_json;
-
-            res = http_json.result;
+            try 
+            {
+              const http_json = JSON.parse(http_text);
+              ${class_name}.last_rpc = http_json;
+              res = http_json.result;
+            }
+            catch {};
           }
 
           return res;

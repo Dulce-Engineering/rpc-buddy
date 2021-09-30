@@ -1,5 +1,5 @@
 const express = require('express');
-const RPC_Buddy = require('./RPC_Buddy');
+const RPC_Buddy = require('./src/RPC_Buddy');
 const Sample_Class = require('./Sample_Class');
 
 const app = express();
@@ -15,7 +15,8 @@ const rpc_buddy = new RPC_Buddy
   [
     {name: "Sample_Class.someFunction"},
     {name: "Sample_Class.Another_Function"},
-  ]
+  ],
+  RPC_Buddy.Express
 );
 
 const port = 80;
