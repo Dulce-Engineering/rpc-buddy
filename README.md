@@ -52,3 +52,13 @@ async function main()
 ## Client Class Fields
 - headers Object: When specified, all given headers are applied to all HTTP requests for the class.
 - On_Fetch Function(url, options, http_res): When specified, all "fetch" results are passed to given function.
+- last_rpc_raw String: Raw text received from last RPC request.
+- last_rpc Object: JSON object received from last RPC request.
+
+## Server Constructor Options
+to do
+## Server Method Options
+- name String: Name of method to expose including class name.
+- inject [Object]: Objects to inject at start of method parameters.
+- On_Post_Server Function: Function to execute when a method is invoked.
+- middleware [Function]: Functions to include as URL middleware.

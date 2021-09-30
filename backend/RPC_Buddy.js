@@ -1,4 +1,4 @@
-const Utils = require("../utils");
+const Utils = require("./Utils");
 
 class RPC_Buddy
 {
@@ -79,7 +79,7 @@ class RPC_Buddy
 
         static async Fetch_RPC(url, method, method_params)
         {
-          let params = {}, param_id = 1;
+          let params = {}, param_id = 1, res;
           for (const method_param of method_params)
           {
             params["p" + param_id] = method_param;
@@ -113,9 +113,18 @@ class RPC_Buddy
           {
             ${class_name}.On_Fetch(url, options, http_res);
           }
-          const http_json = await http_res.json();
+          const http_text = await http_res.text();
+          if (http_text)
+          {
+            ${class_name}.last_rpc_raw = http_text;
 
-          return http_json.result;
+            const http_json = JSON.parse(http_text);
+            ${class_name}.last_rpc = http_json;
+
+            res = http_json.result;
+          }
+
+          return res;
         }
       }
     `;
@@ -143,18 +152,25 @@ class RPC_Buddy
     const fn = this.Get_Fn(req_rpc.method);
     const params_array = this.Get_Params(req_rpc);
 
-    try
+    if (fn)
     {
-      res_fn = await fn(...params_array);
-    }
-    catch (exception)
-    {
-      this.error = exception;
-      error = 
+      try
       {
-        code: exception.name,
-        message: exception.message
+        res_fn = await fn(...params_array);
       }
+      catch (exception)
+      {
+        this.error = exception;
+        error = 
+        {
+          code: exception.code || exception.name,
+          message: exception.message
+        }
+      }
+    }
+    else
+    {
+      // fn not found in class
     }
 
     const res_rpc = 
@@ -280,7 +296,7 @@ class Express
 
   Set_Server_Route(fn_url, fn_middleware)
   {
-    this.app.post(server_url, this.Post_Server);
+    this.app.post(fn_url, this.Post_Server);
   }
 
   Get_Client(req, res)
@@ -298,16 +314,27 @@ class Express
 
   async Post_Server(req, res, next)
   {
-    const res_rpc = await this.Server(req.body);
-    res.json(res_rpc);
+    let exec_method = true;
 
-    if (this.rpc_buddy.error)
+    const fn = this.rpc_buddy.fns.find(fn => fn.name == req.body.method);
+    if (fn.On_Post_Server)
     {
-      if (this.rpc_buddy.on_error_fn)
+      exec_method = fn.On_Post_Server(req, res, next);
+    }
+
+    if (exec_method)
+    {
+      const res_rpc = await this.rpc_buddy.Server(req.body);
+      res.json(res_rpc);
+
+      if (this.rpc_buddy.error)
       {
-        this.rpc_buddy.on_error_fn(this.rpc_buddy.error, req, res, next);
+        if (this.rpc_buddy.on_error_fn)
+        {
+          this.rpc_buddy.on_error_fn(this.rpc_buddy.error, req, res, next);
+        }
+        this.rpc_buddy.error = null;
       }
-      this.rpc_buddy.error = null;
     }
   }
 }
