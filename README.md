@@ -44,6 +44,13 @@ async function main()
 }
 ```
 
+## To Run Sample
+```
+npm i
+npm start
+```
+And browse at http://localhost
+
 ## Client URL Options
 - noexport: When specified, the resulting code does not export the defined classes. They are, instead, avilable globally.
 - class=class_name: When specified, only code for a single class is generated.
