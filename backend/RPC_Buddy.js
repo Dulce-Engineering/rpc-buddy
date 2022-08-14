@@ -7,6 +7,7 @@ class RPC_Buddy
     this.fns = fns;
     this.Client = this.Client.bind(this);
     this.Server = this.Server.bind(this);
+    this.client_cache_control = "max-age=3600";
 
     express_app.post(server_url, this.Server);
     express_app.get(client_url, this.Client);
@@ -66,6 +67,7 @@ class RPC_Buddy
     `;
 
     res.set("Content-Type", "text/javascript");
+    res.set("Cache-Control", this.client_cache_control);
     res.send(class_def);
   }
 
