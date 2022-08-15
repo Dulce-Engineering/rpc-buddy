@@ -8,6 +8,7 @@ class RPC_Buddy
     this.fns = fns;
     this.on_error_fn = on_error_fn;
     this.server_url = server_url;
+    this.client_cache_control = "max-age=3600";
 
     const app_handler = new client_type(this, app);
     app_handler.rpc_buddy = this;
@@ -266,6 +267,7 @@ class Koa
       ctx.query.noexport
     );
 
+    ctx.set("Cache-Control", this.rpc_buddy.client_cache_control);
     ctx.set("Content-Type", "text/javascript");
     ctx.body = class_def;
   }
@@ -316,6 +318,7 @@ class Express
       req.query.noexport
     );
 
+    res.set("Cache-Control", this.rpc_buddy.client_cache_control);
     res.set("Content-Type", "text/javascript");
     res.send(class_def);
   }
