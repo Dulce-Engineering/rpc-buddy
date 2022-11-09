@@ -84,7 +84,7 @@ class RPC_Buddy
 
         static async Fetch_RPC(url, method, method_params)
         {
-          let params = {}, param_id = 1, res;
+          let params = {}, param_id = 1, res = null;
           for (const method_param of method_params)
           {
             params["p" + param_id] = method_param;
@@ -128,9 +128,18 @@ class RPC_Buddy
             {
               const http_json = JSON.parse(http_text);
               ${class_name}.last_rpc = http_json;
+
+              if (http_json.error)
+              {
+                console.error
+                  (http_json.error.stack);
+              }
               res = http_json.result;
             }
-            catch {};
+            catch(e) 
+            {
+              console.error(e);
+            };
           }
 
           return res;
@@ -173,7 +182,8 @@ class RPC_Buddy
         error = 
         {
           code: exception.code || exception.name,
-          message: exception.message
+          message: exception.message,
+          stack: exception.stack
         }
       }
     }
