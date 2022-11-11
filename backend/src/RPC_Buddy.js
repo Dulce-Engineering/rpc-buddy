@@ -113,6 +113,10 @@ class RPC_Buddy
             options.headers = {...options.headers, ...${class_name}.headers};
           }
           
+          if (${class_name}.On_Pre_Fetch)
+          {
+            ${class_name}.On_Pre_Fetch(url, options);
+          }
           const http_res = await fetch(url, options);
           ${class_name}.last_rpc_status = http_res.status;
           if (${class_name}.On_Fetch)
@@ -164,11 +168,12 @@ class RPC_Buddy
     return server_url + "/" + fn.name;
   }
 
-  async Server(req_rpc)
+  async Server(req)
   {
+    const req_rpc = req.body;
     let res_fn, error;
     const fn = this.Get_Fn(req_rpc.method);
-    const params_array = this.Get_Params(req_rpc);
+    const params_array = await this.Get_Params(req);
 
     if (fn)
     {
@@ -215,14 +220,25 @@ class RPC_Buddy
     return fn;
   }
 
-  Get_Params(req_rpc)
+  async Get_Params(req)
   {
+    const req_rpc = req.body;
     const res = RPC_Buddy.To_Array(req_rpc.params);
 
     const fn = this.fns.find(fn => fn.name == req_rpc.method);
     if (fn.inject)
     {
-      res.unshift(...fn.inject);
+      const inject_values = [];
+      for (const inject_param of fn.inject)
+      {
+        let inject_value = inject_param;
+        if (typeof inject_param == "function")
+        {
+          inject_value = await inject_param(req);
+        }
+        inject_values.push(inject_value);
+      }
+      res.unshift(...inject_values);
     }
 
     return res;
@@ -284,7 +300,7 @@ class Koa
 
   async Post_Server(ctx)
   {
-    const res_rpc = await this.rpc_buddy.Server(ctx.request.body);
+    const res_rpc = await this.rpc_buddy.Server(ctx.request);
     ctx.body = res_rpc;
 
     if (this.rpc_buddy.error)
@@ -345,7 +361,7 @@ class Express
 
     if (exec_method)
     {
-      const res_rpc = await this.rpc_buddy.Server(req.body);
+      const res_rpc = await this.rpc_buddy.Server(req);
       res.json(res_rpc);
 
       if (this.rpc_buddy.error)
