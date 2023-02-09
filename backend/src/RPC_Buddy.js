@@ -174,9 +174,11 @@ class RPC_Buddy
     let res_fn, error;
     const fn = this.Get_Fn(req_rpc.method);
     const params_array = await this.Get_Params(req);
+    let fntime = null;
 
     if (fn)
     {
+      const start_time = process.hrtime.bigint();
       try
       {
         res_fn = await fn(...params_array);
@@ -191,6 +193,8 @@ class RPC_Buddy
           stack: exception.stack
         }
       }
+      const duration = process.hrtime.bigint() - start_time;
+      fntime = Number(duration/1000000n);
     }
     else
     {
@@ -202,7 +206,8 @@ class RPC_Buddy
       jsonrpc: "2.0",
       result: res_fn,
       id: req_rpc.id,
-      error
+      error,
+      fntime
     };
     
     return res_rpc;
@@ -351,6 +356,7 @@ class Express
 
   async Post_Server(req, res, next)
   {
+    const start_time = process.hrtime.bigint();
     let exec_method = true;
 
     const fn = this.rpc_buddy.fns.find(fn => fn.name == req.body.method);
@@ -362,6 +368,14 @@ class Express
     if (exec_method)
     {
       const res_rpc = await this.rpc_buddy.Server(req);
+
+      const duration = process.hrtime.bigint() - start_time;
+      res_rpc.rpctime = Number(duration/1000000n);
+      if (res_rpc.fntime != null)
+      {
+        res_rpc.rpctime = res_rpc.rpctime - res_rpc.fntime;
+      }
+
       res.json(res_rpc);
 
       if (this.rpc_buddy.error)
