@@ -65,8 +65,11 @@ And browse at http://localhost
 
 ## Server Constructor Options
 to do
+
 ## Server Method Options
 - name String: Name of method to expose including class name.
 - inject [Object]: Objects to inject at start of method parameters.
+  if the object to inject is a class definition then set an is_class = true property on the
+  class so that RPC Buddy does not attempt to execute its constructor.
 - On_Post_Server Function: Function to execute when a method is invoked.
 - middleware [Function]: Functions to include as URL middleware.

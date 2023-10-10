@@ -135,8 +135,18 @@ class RPC_Buddy
 
               if (http_json.error)
               {
-                console.error
-                  (http_json.error.stack);
+                if (${class_name}.On_Error)
+                {
+                  ${class_name}.On_Error(url, options, http_json);
+                }
+                else if (http_json.error.stack)
+                {
+                  console.error(http_json.error.stack);
+                }
+                else
+                {
+                  console.error(http_json.error.code + ": " + http_json.error.message);
+                }
               }
               res = http_json.result;
             }
@@ -171,10 +181,13 @@ class RPC_Buddy
   async Server(req)
   {
     const req_rpc = req.body;
-    let res_fn, error;
+    let res_fn = null, error = null, fntime = null;
+
+    const has_auth = await this.Has_Auth(req);
+    if (has_auth)
+    {
     const fn = this.Get_Fn(req_rpc.method);
     const params_array = await this.Get_Params(req);
-    let fntime = null;
 
     if (fn)
     {
@@ -198,7 +211,20 @@ class RPC_Buddy
     }
     else
     {
-      // fn not found in class
+        error = 
+        {
+          code: "RPC_ERROR_NOT_FOUND",
+          message: "The method " + req_rpc.method + " was not found.",
+        }
+      }
+    }
+    else
+    {
+      error = 
+      {
+        code: "RPC_ERROR_NO_AUTH",
+        message: "The method " + req_rpc.method + " requires authorisation.",
+      }
     }
 
     const res_rpc = 
@@ -211,6 +237,20 @@ class RPC_Buddy
     };
     
     return res_rpc;
+  }
+
+  async Has_Auth(req)
+  {
+    let res = true;
+    const req_rpc = req.body;
+    const fn = this.fns.find(fn => fn.name == req_rpc.method);
+
+    if (fn?.on_auth_fn)
+    {
+      res = await fn.on_auth_fn(req);
+    }
+
+    return res;
   }
 
   Get_Fn(fn_namespace)
@@ -237,10 +277,12 @@ class RPC_Buddy
       for (const inject_param of fn.inject)
       {
         let inject_value = inject_param;
-        if (typeof inject_param == "function")
+
+        if (typeof inject_param == "function" && !inject_param.is_class)
         {
           inject_value = await inject_param(req);
         }
+
         inject_values.push(inject_value);
       }
       res.unshift(...inject_values);
